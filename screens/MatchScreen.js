@@ -40,7 +40,11 @@ const MatchScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.startButton}>
-        <Button title="Start Now" onPress={handleStartMatch} />
+        <Button
+          title="Start Now"
+          onPress={handleStartMatch}
+          disabled={playerName1.length === 0 || playerName2.length === 0}
+        />
       </View>
     </View>
   );

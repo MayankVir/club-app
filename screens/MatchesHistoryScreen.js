@@ -1,12 +1,21 @@
-import React, { useContext, useState } from "react";
-import { View, Text, StyleSheet, FlatList, Button } from "react-native";
+import React, { useContext, useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Button,
+  TextInput,
+} from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { ClubContext } from "../context/ClubContext";
+import { getMatchHistory } from "../services/api";
 
 const MatchesHistoryScreen = () => {
-  const { matchesHistory } = useContext(ClubContext);
+  const { matchesHistory, setMatchesHistory } = useContext(ClubContext);
   const [filterDate, setFilterDate] = useState(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [clubId, setClubId] = useState("");
 
   const handleDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || filterDate;
@@ -14,16 +23,38 @@ const MatchesHistoryScreen = () => {
     setFilterDate(currentDate);
   };
 
-  const filteredMatches = matchesHistory.filter((match) => {
-    if (!filterDate) return true;
-    const matchDate = new Date(match.date); // Ensure `match.date` is stored as a date string
-    return matchDate.toDateString() === filterDate.toDateString();
-  });
+  const fetchMatchHistory = async () => {
+    const filters = {
+      date: filterDate,
+      club_id: clubId,
+    };
+
+    try {
+      const history = await getMatchHistory(filters);
+      const { data = [] } = history;
+      console.log({ history });
+      setMatchesHistory(data);
+    } catch (error) {
+      // console.error("Error fetching match history:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchMatchHistory();
+  }, []);
+
+  // const filteredMatches = matchesHistory.filter((match) => {
+  //   if (!filterDate) return true;
+  //   const matchDate = new Date(match.date);
+  //   return matchDate.toDateString() === filterDate.toDateString();
+  // });
 
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Matches History</Text>
+
       <Button title="Select Date" onPress={() => setShowDatePicker(true)} />
+
       {showDatePicker && (
         <DateTimePicker
           value={filterDate || new Date()}
@@ -33,7 +64,7 @@ const MatchesHistoryScreen = () => {
         />
       )}
       <FlatList
-        data={filteredMatches}
+        data={matchesHistory}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
           <View style={styles.matchItem}>
@@ -51,12 +82,12 @@ const MatchesHistoryScreen = () => {
                   {item.subscriptionType}
                 </Text>
               </Text>
-              <Text style={styles.matchText}>
+              {/* <Text style={styles.matchText}>
                 Date:{" "}
                 <Text style={styles.matchTextValue}>
                   {new Date(item.date).toLocaleDateString()}
                 </Text>
-              </Text>
+              </Text> */}
             </View>
             <View style={styles.playerBox}>
               <Text style={styles.matchText}>
@@ -78,6 +109,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#1e3b63",
     padding: 20,
+  },
+  filterContainer: {
+    display: "flex",
+    alignItems: "center",
+    gap: 5,
   },
   header: {
     fontSize: 24,

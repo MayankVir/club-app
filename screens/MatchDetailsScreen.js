@@ -1,14 +1,22 @@
 import React, { useContext } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import { ClubContext } from "../context/ClubContext";
+import { saveMatchDetails } from "../services/api"; // Import API
 
 const MatchDetailsScreen = ({ navigation }) => {
   const {
-    clubName,
+    selectedClub,
     address,
+
     subscriptionType,
     image,
-    saveMatchDetails,
     playerName1,
     player1Score,
     playerName2,
@@ -16,9 +24,9 @@ const MatchDetailsScreen = ({ navigation }) => {
     resetState,
   } = useContext(ClubContext);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     const matchDetails = {
-      clubName,
+      club_id: selectedClub.id,
       address,
       subscriptionType,
       player1Name: playerName1,
@@ -28,10 +36,16 @@ const MatchDetailsScreen = ({ navigation }) => {
       date: new Date().toISOString(),
     };
 
-    saveMatchDetails(matchDetails);
+    try {
+      await saveMatchDetails(matchDetails);
+      Alert.alert("Success", "Match details saved successfully.");
+    } catch (error) {
+      Alert.alert("Error", "Failed to save match details.");
+    }
     resetState();
     navigation.navigate("Home");
   };
+  console.log({ selectedClub });
 
   return (
     <View style={styles.container}>
@@ -40,7 +54,7 @@ const MatchDetailsScreen = ({ navigation }) => {
       <View style={styles.detailContainer}>
         <View style={styles.detailBox}>
           <Text style={styles.detailText}>Club Name: </Text>
-          <Text style={styles.detailTextValue}>{clubName}</Text>
+          <Text style={styles.detailTextValue}>{selectedClub?.club_name}</Text>
         </View>
         <View style={styles.detailBoxPlayer}>
           <Text style={styles.detailText}>Player 1: </Text>
@@ -76,10 +90,10 @@ const MatchDetailsScreen = ({ navigation }) => {
           Show Matches History
         </Text>
       </View>
-
+      {/* 
       <View style={styles.detailBox}>
         <Text style={styles.detailText}>Show Notifications</Text>
-      </View>
+      </View> */}
 
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutButtonText}>Logout</Text>

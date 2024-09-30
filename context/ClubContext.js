@@ -4,9 +4,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export const ClubContext = createContext();
 
 export const ClubProvider = ({ children }) => {
-  const [clubName, setClubName] = useState("");
+  const [clubs, setClubs] = useState([]);
   const [address, setAddress] = useState("");
-  const [subscriptionType, setSubscriptionType] = useState("");
+  const [subscriptionType, setSubscriptionType] = useState(null);
   const [image, setImage] = useState(null);
   const [matchesHistory, setMatchesHistory] = useState([]);
   const [playerName1, setPlayerName1] = useState("");
@@ -14,37 +14,11 @@ export const ClubProvider = ({ children }) => {
   const [player1Score, setPlayer1Score] = useState(0);
   const [player2Score, setPlayer2Score] = useState(0);
   const [notifications, setNotifications] = useState([]);
-
-  useEffect(() => {
-    const loadMatchesHistory = async () => {
-      try {
-        const storedMatches = await AsyncStorage.getItem("matchesHistory");
-        if (storedMatches) {
-          setMatchesHistory(JSON.parse(storedMatches));
-        }
-      } catch (error) {
-        console.error("Failed to load matches history:", error);
-      }
-    };
-
-    loadMatchesHistory();
-  }, []);
-
-  const saveMatchDetails = async (matchDetails) => {
-    try {
-      const updatedMatches = [...matchesHistory, matchDetails];
-      setMatchesHistory(updatedMatches);
-      await AsyncStorage.setItem(
-        "matchesHistory",
-        JSON.stringify(updatedMatches),
-      );
-    } catch (error) {
-      console.error("Failed to save match details:", error);
-    }
-  };
+  const [selectedClub, setSelectedClub] = useState(null);
 
   const resetState = () => {
-    setClubName("");
+    setClubs([]);
+    setSelectedClub(null);
     setAddress("");
     setSubscriptionType("");
     setImage(null);
@@ -59,8 +33,10 @@ export const ClubProvider = ({ children }) => {
   return (
     <ClubContext.Provider
       value={{
-        clubName,
-        setClubName,
+        clubs,
+        setClubs,
+        selectedClub,
+        setSelectedClub,
         address,
         setAddress,
         subscriptionType,
@@ -79,7 +55,6 @@ export const ClubProvider = ({ children }) => {
         setPlayer2Score,
         notifications,
         setNotifications,
-        saveMatchDetails,
         resetState,
       }}
     >

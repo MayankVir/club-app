@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,21 +8,32 @@ import {
   Image,
   TouchableOpacity,
   Alert,
+  ActivityIndicator,
 } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from "expo-image-picker";
 import { ClubContext } from "../context/ClubContext";
+import { getClubList } from "../services/api";
+import DropDownPicker from "react-native-dropdown-picker";
+import { subscriptionTypes } from "../constants/subscriptions";
 
 const HomeScreen = ({ navigation }) => {
   const {
-    clubName,
-    setClubName,
+    clubs,
     address,
     setAddress,
+    setClubs,
+    selectedClub,
+    setSelectedClub,
     subscriptionType,
     setSubscriptionType,
     image,
     setImage,
   } = useContext(ClubContext);
+  const [isLoading, setIsLoading] = useState(true);
+  const [open, setOpen] = useState(false);
+  const [openSubscriptionType, setOpenSubscriptionType] = useState(false);
+  const [items, setItems] = useState([]);
 
   const pickImage = async () => {
     let permissionResult =
@@ -49,26 +60,69 @@ const HomeScreen = ({ navigation }) => {
     navigation.navigate("Match");
   };
 
+  useEffect(() => {
+    const fetchClubs = async () => {
+      try {
+        const response = await getClubList();
+
+        const formattedClubs = response.data.map((club) => ({
+          label: club.club_name,
+          value: club.id,
+          clubObj: club,
+        }));
+        setItems(formattedClubs);
+        setClubs(response.data);
+      } catch (err) {
+        setError("Error fetching clubs");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchClubs();
+  }, []);
+
+  if (isLoading) return <ActivityIndicator size="large" color="#0000ff" />;
+
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        onPress={pickImage}
-        style={styles.profilePictureContainer}
-      >
-        {image ? (
-          <Image source={{ uri: image }} style={styles.profilePicture} />
-        ) : (
-          <View style={styles.profilePicture}>
-            <Text style={styles.profilePictureText}>Club Profile Picture</Text>
-          </View>
-        )}
-      </TouchableOpacity>
+      {selectedClub?.club_image ? (
+        <Image
+          source={{ uri: selectedClub?.club_image }}
+          style={styles.profilePicture}
+        />
+      ) : (
+        <View style={styles.profilePicture}>
+          <Text style={styles.profilePictureText}>Club Profile Picture</Text>
+        </View>
+      )}
 
-      <TextInput
-        style={styles.input}
-        placeholder="Club Name"
-        value={clubName}
-        onChangeText={(text) => setClubName(text)}
+      <DropDownPicker
+        open={open}
+        value={selectedClub}
+        items={items}
+        setOpen={setOpen}
+        setValue={setSelectedClub}
+        setItems={setItems}
+        placeholder="Select a club"
+        onChangeValue={(value) => {
+          const foundClub = clubs.find((item) => item.id === value);
+
+          console.log({ foundClub });
+
+          if (foundClub) {
+            const obj = {
+              ...foundClub,
+              label: foundClub.club_name,
+              value: foundClub.id,
+            };
+
+            console.log({ obj });
+
+            setSelectedClub(obj);
+          }
+        }}
+        style={styles.dropdown}
       />
       <TextInput
         style={styles.input}
@@ -76,15 +130,33 @@ const HomeScreen = ({ navigation }) => {
         value={address}
         onChangeText={(text) => setAddress(text)}
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Subscription Type"
+      <DropDownPicker
+        open={openSubscriptionType}
         value={subscriptionType}
-        onChangeText={(text) => setSubscriptionType(text)}
+        items={subscriptionTypes}
+        setOpen={setOpenSubscriptionType}
+        setValue={setSubscriptionType}
+        placeholder="Select a subscription"
+        onChangeValue={(value) => {
+          const foundSubscrpition = subscriptionTypes.find(
+            (item) => item.value === value,
+          );
+
+          console.log({ foundSubscrpition });
+
+          setSubscriptionType(foundSubscrpition);
+        }}
+        style={{ ...styles.dropdown, zIndex: -1 }}
       />
 
       <View style={styles.submitButton}>
-        <Button title="Submit" onPress={handleSubmit} />
+        <Button
+          title="Submit"
+          onPress={handleSubmit}
+          disabled={
+            !!subscriptionType || address.length === 0 || selectedClub === null
+          }
+        />
       </View>
     </View>
   );
@@ -126,6 +198,20 @@ const styles = StyleSheet.create({
   submitButton: {
     marginTop: 20,
     width: "30%",
+  },
+  dropdown: {
+    marginBottom: 20,
+    marginLeft: 190,
+    width: "70%",
+    backgroundColor: "#fafafa",
+    borderColor: "#ccc",
+  },
+  dropdownContainer: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    textAlign: "center",
+    width: 70,
   },
 });
 
