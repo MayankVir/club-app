@@ -10,7 +10,6 @@ import {
   Alert,
   ActivityIndicator,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from "expo-image-picker";
 import { ClubContext } from "../context/ClubContext";
 import { getClubList } from "../services/api";
@@ -19,21 +18,21 @@ import { subscriptionTypes } from "../constants/subscriptions";
 
 const HomeScreen = ({ navigation }) => {
   const {
-    clubs,
     address,
     setAddress,
-    setClubs,
     selectedClub,
     setSelectedClub,
     subscriptionType,
     setSubscriptionType,
-    image,
     setImage,
   } = useContext(ClubContext);
   const [isLoading, setIsLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [openSubscriptionType, setOpenSubscriptionType] = useState(false);
-  const [items, setItems] = useState([]);
+  const [clubs, setClubs] = useState([]);
+  const [clubValue, setClubValue] = useState(null);
+  const [subscriptionValue, setSubscriptionValue] = useState(null);
+  const [error, setError] = useState("");
 
   const pickImage = async () => {
     let permissionResult =
@@ -57,6 +56,8 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const handleSubmit = () => {
+    setClubValue(null);
+    setSubscriptionValue(null);
     navigation.navigate("Match");
   };
 
@@ -68,12 +69,11 @@ const HomeScreen = ({ navigation }) => {
         const formattedClubs = response.data.map((club) => ({
           label: club.club_name,
           value: club.id,
-          clubObj: club,
+          ...club,
         }));
-        setItems(formattedClubs);
-        setClubs(response.data);
+        setClubs(formattedClubs);
       } catch (err) {
-        setError("Error fetching clubs");
+        setError(err);
       } finally {
         setIsLoading(false);
       }
@@ -99,16 +99,14 @@ const HomeScreen = ({ navigation }) => {
 
       <DropDownPicker
         open={open}
-        value={selectedClub}
-        items={items}
+        value={clubValue}
+        items={clubs}
         setOpen={setOpen}
-        setValue={setSelectedClub}
-        setItems={setItems}
+        setValue={setClubValue}
+        setItems={setClubs}
         placeholder="Select a club"
         onChangeValue={(value) => {
           const foundClub = clubs.find((item) => item.id === value);
-
-          console.log({ foundClub });
 
           if (foundClub) {
             const obj = {
@@ -117,9 +115,12 @@ const HomeScreen = ({ navigation }) => {
               value: foundClub.id,
             };
 
-            console.log({ obj });
-
-            setSelectedClub(obj);
+            // setSelectedClub(obj);
+            setSelectedClub({
+              label: foundClub.club_name,
+              value: foundClub.id,
+              ...foundClub,
+            });
           }
         }}
         style={styles.dropdown}
@@ -132,17 +133,15 @@ const HomeScreen = ({ navigation }) => {
       />
       <DropDownPicker
         open={openSubscriptionType}
-        value={subscriptionType}
+        value={subscriptionValue}
         items={subscriptionTypes}
         setOpen={setOpenSubscriptionType}
-        setValue={setSubscriptionType}
+        setValue={setSubscriptionValue}
         placeholder="Select a subscription"
         onChangeValue={(value) => {
           const foundSubscrpition = subscriptionTypes.find(
             (item) => item.value === value,
           );
-
-          console.log({ foundSubscrpition });
 
           setSubscriptionType(foundSubscrpition);
         }}
@@ -154,7 +153,9 @@ const HomeScreen = ({ navigation }) => {
           title="Submit"
           onPress={handleSubmit}
           disabled={
-            !!subscriptionType || address.length === 0 || selectedClub === null
+            subscriptionType === null ||
+            address.length === 0 ||
+            selectedClub === null
           }
         />
       </View>

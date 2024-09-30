@@ -14,7 +14,6 @@ const MatchDetailsScreen = ({ navigation }) => {
   const {
     selectedClub,
     address,
-
     subscriptionType,
     image,
     playerName1,
@@ -28,7 +27,7 @@ const MatchDetailsScreen = ({ navigation }) => {
     const matchDetails = {
       club_id: selectedClub.id,
       address,
-      subscriptionType,
+      subscriptionType: subscriptionType.value,
       player1Name: playerName1,
       player2Name: playerName2,
       player1Score: player1Score,
@@ -45,7 +44,6 @@ const MatchDetailsScreen = ({ navigation }) => {
     resetState();
     navigation.navigate("Home");
   };
-  console.log({ selectedClub });
 
   return (
     <View style={styles.container}>
@@ -79,7 +77,7 @@ const MatchDetailsScreen = ({ navigation }) => {
 
       <View style={styles.detailBox}>
         <Text style={styles.detailText}>Subscription Type: </Text>
-        <Text style={styles.detailTextValue}>{subscriptionType}</Text>
+        <Text style={styles.detailTextValue}>{subscriptionType.label}</Text>
       </View>
 
       <View style={styles.detailBox}>

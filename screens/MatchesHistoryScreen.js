@@ -32,7 +32,6 @@ const MatchesHistoryScreen = () => {
     try {
       const history = await getMatchHistory(filters);
       const { data = [] } = history;
-      console.log({ history });
       setMatchesHistory(data);
     } catch (error) {
       // console.error("Error fetching match history:", error);

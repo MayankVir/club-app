@@ -16,8 +16,6 @@ export const saveMatchDetails = async (matchDetails) => {
     formData.append(key, matchDetails[key]);
   }
 
-  console.log({ matchDetails });
-
   try {
     const response = await apiClient.post("/save-match-details", formData);
     return response.data;
