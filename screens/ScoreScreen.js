@@ -25,8 +25,22 @@ const ScoreScreen = ({ navigation }) => {
     try {
       await updateScore({
         match_id: matchId,
-        player1Score: p1Score,
-        player2Score: p2Score,
+        player1Score:
+          player1Score === p1Score
+            ? 0
+            : player1Score < p1Score
+            ? 1
+            : player1Score > p1Score
+            ? -1
+            : 0,
+        player2Score:
+          player2Score === p2Score
+            ? 0
+            : player2Score < p2Score
+            ? 1
+            : player2Score > p2Score
+            ? -1
+            : 0,
       });
       setPlayer1Score(p1Score);
       setPlayer2Score(p2Score);
