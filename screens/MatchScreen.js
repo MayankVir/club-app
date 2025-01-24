@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Image,
   Alert,
+  ScrollView,
 } from "react-native";
 import { ClubContext } from "../context/ClubContext";
 import { saveMatchDetails } from "../services/api";
@@ -50,34 +51,36 @@ const MatchScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      {image && <Image source={{ uri: image }} style={styles.clubImage} />}
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.container}>
+        {image && <Image source={{ uri: image }} style={styles.clubImage} />}
 
-      <Text style={styles.title}>Match 1</Text>
+        <Text style={styles.title}>Match 1</Text>
 
-      <View style={styles.inputRow}>
-        <TextInput
-          style={styles.input}
-          placeholder="Player Name 1"
-          value={playerName1}
-          onChangeText={(text) => setPlayerName1(text)}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Player Name 2"
-          value={playerName2}
-          onChangeText={(text) => setPlayerName2(text)}
-        />
+        <View style={styles.inputRow}>
+          <TextInput
+            style={styles.input}
+            placeholder="Player Name 1"
+            value={playerName1}
+            onChangeText={(text) => setPlayerName1(text)}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Player Name 2"
+            value={playerName2}
+            onChangeText={(text) => setPlayerName2(text)}
+          />
+        </View>
+
+        <View style={styles.startButton}>
+          <Button
+            title="Start Now"
+            onPress={handleStartMatch}
+            disabled={playerName1.length === 0 || playerName2.length === 0}
+          />
+        </View>
       </View>
-
-      <View style={styles.startButton}>
-        <Button
-          title="Start Now"
-          onPress={handleStartMatch}
-          disabled={playerName1.length === 0 || playerName2.length === 0}
-        />
-      </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -119,6 +122,9 @@ const styles = StyleSheet.create({
   startButton: {
     marginTop: 20,
     width: "50%",
+  },
+  scrollContainer: {
+    flexGrow: 1,
   },
 });
 

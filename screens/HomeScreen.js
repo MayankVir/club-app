@@ -6,9 +6,9 @@ import {
   Button,
   StyleSheet,
   Image,
-  TouchableOpacity,
   Alert,
   ActivityIndicator,
+  ScrollView,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { ClubContext } from "../context/ClubContext";
@@ -83,134 +83,149 @@ const HomeScreen = ({ navigation }) => {
   if (isLoading) return <ActivityIndicator size="large" color="#0000ff" />;
 
   return (
-    <View style={styles.container}>
-      {selectedClub?.club_image ? (
-        <Image
-          source={{ uri: selectedClub?.club_image }}
-          style={styles.profilePicture}
-        />
-      ) : (
-        <View style={styles.profilePicture}>
-          <Text style={styles.profilePictureText}>Club Profile Picture</Text>
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.container}>
+        {selectedClub?.club_image ? (
+          <Image
+            source={{ uri: selectedClub?.club_image }}
+            style={styles.profilePicture}
+          />
+        ) : (
+          <View style={styles.profilePicture}>
+            <Text style={styles.profilePictureText}>Club Profile Picture</Text>
+          </View>
+        )}
+
+        <View style={styles.innerContainer}>
+          <DropDownPicker
+            open={open}
+            value={clubValue}
+            items={clubs}
+            setOpen={setOpen}
+            setValue={setClubValue}
+            setItems={setClubs}
+            placeholder="Select a club"
+            onChangeValue={(value) => {
+              const foundClub = clubs.find((item) => item.id === value);
+              if (foundClub) {
+                setSelectedClub({
+                  label: foundClub.club_name,
+                  value: foundClub.id,
+                  ...foundClub,
+                });
+              }
+            }}
+            style={styles.dropdown}
+            containerStyle={styles.dropdownContainer}
+            zIndex={3000}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Address"
+            value={address}
+            onChangeText={(text) => setAddress(text)}
+          />
+          <DropDownPicker
+            open={openSubscriptionType}
+            value={subscriptionValue}
+            items={subscriptionTypes}
+            setOpen={setOpenSubscriptionType}
+            setValue={setSubscriptionValue}
+            placeholder="Select a subscription"
+            onChangeValue={(value) => {
+              const foundSubscription = subscriptionTypes.find(
+                (item) => item.value === value
+              );
+              setSubscriptionType(foundSubscription);
+            }}
+            style={styles.dropdown}
+            containerStyle={styles.dropdownContainer}
+            zIndex={2000}
+          />
+
+          <View style={styles.submitButton}>
+            <Button
+              title="Submit"
+              onPress={handleSubmit}
+              disabled={
+                subscriptionType === null ||
+                address.length === 0 ||
+                selectedClub === null
+              }
+            />
+          </View>
         </View>
-      )}
-
-      <DropDownPicker
-        open={open}
-        value={clubValue}
-        items={clubs}
-        setOpen={setOpen}
-        setValue={setClubValue}
-        setItems={setClubs}
-        placeholder="Select a club"
-        onChangeValue={(value) => {
-          const foundClub = clubs.find((item) => item.id === value);
-
-          if (foundClub) {
-            const obj = {
-              ...foundClub,
-              label: foundClub.club_name,
-              value: foundClub.id,
-            };
-
-            // setSelectedClub(obj);
-            setSelectedClub({
-              label: foundClub.club_name,
-              value: foundClub.id,
-              ...foundClub,
-            });
-          }
-        }}
-        style={styles.dropdown}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Address"
-        value={address}
-        onChangeText={(text) => setAddress(text)}
-      />
-      <DropDownPicker
-        open={openSubscriptionType}
-        value={subscriptionValue}
-        items={subscriptionTypes}
-        setOpen={setOpenSubscriptionType}
-        setValue={setSubscriptionValue}
-        placeholder="Select a subscription"
-        onChangeValue={(value) => {
-          const foundSubscrpition = subscriptionTypes.find(
-            (item) => item.value === value
-          );
-
-          setSubscriptionType(foundSubscrpition);
-        }}
-        style={{ ...styles.dropdown, zIndex: -1 }}
-      />
-
-      <View style={styles.submitButton}>
-        <Button
-          title="Submit"
-          onPress={handleSubmit}
-          disabled={
-            subscriptionType === null ||
-            address.length === 0 ||
-            selectedClub === null
-          }
-        />
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    display: "flex",
+    flexDirection: "column",
     backgroundColor: "#1e3b63",
     alignItems: "center",
     justifyContent: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 50,
+    gap: 10,
+  },
+  innerContainer: {
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 5,
+    width: "75%",
+    maxWidth: 600,
   },
   profilePictureContainer: {
     alignItems: "center",
-    marginBottom: 30,
+    marginBottom: 20,
   },
   profilePicture: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     backgroundColor: "#fff",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 15,
   },
   profilePictureText: {
     textAlign: "center",
     color: "#000",
+    fontSize: 12,
   },
   input: {
-    width: "70%",
+    width: "100%",
     height: 50,
     backgroundColor: "#fff",
     borderRadius: 10,
-    marginBottom: 20,
+    marginBottom: 15,
     paddingHorizontal: 10,
-    fontSize: 18,
+    fontSize: 16,
   },
   submitButton: {
-    marginTop: 20,
-    width: "30%",
+    marginTop: 15,
+    width: "50%",
   },
   dropdown: {
-    marginBottom: 20,
-    marginLeft: 190,
-    width: "70%",
+    marginBottom: 15,
+    width: "100%",
     backgroundColor: "#fafafa",
     borderColor: "#ccc",
+    marginLeft: 0,
   },
   dropdownContainer: {
-    display: "flex",
-    justifyContent: "center",
+    width: "100%",
     alignItems: "center",
-    textAlign: "center",
-    width: 70,
+  },
+  scrollContainer: {
+    flexGrow: 1,
   },
 });
 

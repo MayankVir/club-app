@@ -6,6 +6,7 @@ import {
   Image,
   TouchableOpacity,
   Alert,
+  ScrollView,
 } from "react-native";
 import { ClubContext } from "../context/ClubContext";
 import { saveMatchDetails } from "../services/api"; // Import API
@@ -46,57 +47,61 @@ const MatchDetailsScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      {image && <Image source={{ uri: image }} style={styles.clubImage} />}
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.container}>
+        {image && <Image source={{ uri: image }} style={styles.clubImage} />}
 
-      <View style={styles.detailContainer}>
-        <View style={styles.detailBox}>
-          <Text style={styles.detailText}>Club Name: </Text>
-          <Text style={styles.detailTextValue}>{selectedClub?.club_name}</Text>
+        <View style={styles.detailContainer}>
+          <View style={styles.detailBox}>
+            <Text style={styles.detailText}>Club Name: </Text>
+            <Text style={styles.detailTextValue}>
+              {selectedClub?.club_name}
+            </Text>
+          </View>
+          <View style={styles.detailBoxPlayer}>
+            <Text style={styles.detailText}>Player 1: </Text>
+            <Text style={styles.detailTextValue}>
+              {playerName1} - {player1Score}
+            </Text>
+          </View>
         </View>
-        <View style={styles.detailBoxPlayer}>
-          <Text style={styles.detailText}>Player 1: </Text>
-          <Text style={styles.detailTextValue}>
-            {playerName1} - {player1Score}
+
+        <View style={styles.detailContainer}>
+          <View style={styles.detailBox}>
+            <Text style={styles.detailText}>Address: </Text>
+            <Text style={styles.detailTextValue}>{address}</Text>
+          </View>
+          <View style={styles.detailBoxPlayer}>
+            <Text style={styles.detailText}>Player 2: </Text>
+            <Text style={styles.detailTextValue}>
+              {playerName2} - {player2Score}
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.detailBox}>
+          <Text style={styles.detailText}>Subscription Type: </Text>
+          <Text style={styles.detailTextValue}>{subscriptionType.label}</Text>
+        </View>
+
+        <View style={styles.detailBox}>
+          <Text
+            style={styles.detailText}
+            onPress={() => navigation.navigate("MatchesHistoryScreen")}
+          >
+            Show Matches History
           </Text>
         </View>
-      </View>
-
-      <View style={styles.detailContainer}>
+        {/* 
         <View style={styles.detailBox}>
-          <Text style={styles.detailText}>Address: </Text>
-          <Text style={styles.detailTextValue}>{address}</Text>
-        </View>
-        <View style={styles.detailBoxPlayer}>
-          <Text style={styles.detailText}>Player 2: </Text>
-          <Text style={styles.detailTextValue}>
-            {playerName2} - {player2Score}
-          </Text>
-        </View>
-      </View>
+          <Text style={styles.detailText}>Show Notifications</Text>
+        </View> */}
 
-      <View style={styles.detailBox}>
-        <Text style={styles.detailText}>Subscription Type: </Text>
-        <Text style={styles.detailTextValue}>{subscriptionType.label}</Text>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutButtonText}>Logout</Text>
+        </TouchableOpacity>
       </View>
-
-      <View style={styles.detailBox}>
-        <Text
-          style={styles.detailText}
-          onPress={() => navigation.navigate("MatchesHistoryScreen")}
-        >
-          Show Matches History
-        </Text>
-      </View>
-      {/* 
-      <View style={styles.detailBox}>
-        <Text style={styles.detailText}>Show Notifications</Text>
-      </View> */}
-
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Text style={styles.logoutButtonText}>Logout</Text>
-      </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -170,6 +175,9 @@ const styles = StyleSheet.create({
     fontSize: 30,
     color: "#1e3b63",
     fontWeight: "bold",
+  },
+  scrollContainer: {
+    flexGrow: 1,
   },
 });
 

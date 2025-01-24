@@ -7,6 +7,7 @@ import {
   Image,
   TouchableOpacity,
   Alert,
+  ScrollView,
 } from "react-native";
 import { ClubContext } from "../context/ClubContext";
 import { updateScore } from "../services/api";
@@ -73,50 +74,52 @@ const ScoreScreen = ({ navigation }) => {
     navigation.navigate("MatchDetails");
   };
   return (
-    <View style={styles.container}>
-      {image && <Image source={{ uri: image }} style={styles.clubImage} />}
-      <View style={styles.scoreContainer}>
-        <View style={styles.playerContainer}>
-          <Text style={styles.score}>{player1Score}</Text>
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={incrementPlayer1Score}
-            >
-              <Text style={styles.buttonText}>+</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={decrementPlayer1Score}
-              disabled={player1Score === 0}
-            >
-              <Text style={styles.buttonText}>-</Text>
-            </TouchableOpacity>
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.container}>
+        {image && <Image source={{ uri: image }} style={styles.clubImage} />}
+        <View style={styles.scoreContainer}>
+          <View style={styles.playerContainer}>
+            <Text style={styles.score}>{player1Score}</Text>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={incrementPlayer1Score}
+              >
+                <Text style={styles.buttonText}>+</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={decrementPlayer1Score}
+                disabled={player1Score === 0}
+              >
+                <Text style={styles.buttonText}>-</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={styles.playerContainer}>
+            <Text style={styles.score}>{player2Score}</Text>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={incrementPlayer2Score}
+              >
+                <Text style={styles.buttonText}>+</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={decrementPlayer2Score}
+                disabled={player2Score === 0}
+              >
+                <Text style={styles.buttonText}>-</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-        <View style={styles.playerContainer}>
-          <Text style={styles.score}>{player2Score}</Text>
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={incrementPlayer2Score}
-            >
-              <Text style={styles.buttonText}>+</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={decrementPlayer2Score}
-              disabled={player2Score === 0}
-            >
-              <Text style={styles.buttonText}>-</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+        <TouchableOpacity style={styles.endButton} onPress={handleEndMatch}>
+          <Text style={styles.endButtonText}>End Match</Text>
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.endButton} onPress={handleEndMatch}>
-        <Text style={styles.endButtonText}>End Match</Text>
-      </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -176,6 +179,9 @@ const styles = StyleSheet.create({
     fontSize: 30,
     color: "#1e3b63",
     fontWeight: "bold",
+  },
+  scrollContainer: {
+    flexGrow: 1,
   },
 });
 
