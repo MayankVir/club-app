@@ -56,8 +56,6 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const handleSubmit = () => {
-    setClubValue(null);
-    setSubscriptionValue(null);
     navigation.navigate("Match");
   };
 
@@ -140,7 +138,7 @@ const HomeScreen = ({ navigation }) => {
         placeholder="Select a subscription"
         onChangeValue={(value) => {
           const foundSubscrpition = subscriptionTypes.find(
-            (item) => item.value === value,
+            (item) => item.value === value
           );
 
           setSubscriptionType(foundSubscrpition);

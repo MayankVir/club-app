@@ -15,6 +15,7 @@ export const ClubProvider = ({ children }) => {
   const [player2Score, setPlayer2Score] = useState(0);
   const [notifications, setNotifications] = useState([]);
   const [selectedClub, setSelectedClub] = useState(null);
+  const [matchId, setMatchId] = useState(null);
 
   const resetState = () => {
     setClubs([]);
@@ -28,6 +29,7 @@ export const ClubProvider = ({ children }) => {
     setPlayer1Score(0);
     setPlayer2Score(0);
     setNotifications([]);
+    setMatchId(null);
   };
 
   return (
@@ -56,6 +58,8 @@ export const ClubProvider = ({ children }) => {
         notifications,
         setNotifications,
         resetState,
+        matchId,
+        setMatchId,
       }}
     >
       {children}

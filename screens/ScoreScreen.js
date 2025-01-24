@@ -6,8 +6,10 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { ClubContext } from "../context/ClubContext";
+import { updateScore } from "../services/api";
 
 const ScoreScreen = ({ navigation }) => {
   const {
@@ -16,15 +18,42 @@ const ScoreScreen = ({ navigation }) => {
     setPlayer1Score,
     player2Score,
     setPlayer2Score,
+    matchId,
   } = useContext(ClubContext);
 
-  const incrementPlayer1Score = () => setPlayer1Score(player1Score + 1);
-  const decrementPlayer1Score = () =>
-    setPlayer1Score(player1Score > 0 ? player1Score - 1 : 0);
+  const updateScoreAPI = async (p1Score, p2Score) => {
+    try {
+      await updateScore({
+        match_id: matchId,
+        player1Score: p1Score,
+        player2Score: p2Score,
+      });
+      setPlayer1Score(p1Score);
+      setPlayer2Score(p2Score);
+    } catch (error) {
+      Alert.alert("Error", "Failed to update score");
+    }
+  };
 
-  const incrementPlayer2Score = () => setPlayer2Score(player2Score + 1);
-  const decrementPlayer2Score = () =>
-    setPlayer2Score(player2Score > 0 ? player2Score - 1 : 0);
+  const incrementPlayer1Score = async () => {
+    await updateScoreAPI(player1Score + 1, player2Score);
+  };
+
+  const decrementPlayer1Score = async () => {
+    if (player1Score > 0) {
+      await updateScoreAPI(player1Score - 1, player2Score);
+    }
+  };
+
+  const incrementPlayer2Score = async () => {
+    await updateScoreAPI(player1Score, player2Score + 1);
+  };
+
+  const decrementPlayer2Score = async () => {
+    if (player2Score > 0) {
+      await updateScoreAPI(player1Score, player2Score - 1);
+    }
+  };
 
   const handleEndMatch = () => {
     navigation.navigate("MatchDetails");
@@ -45,6 +74,7 @@ const ScoreScreen = ({ navigation }) => {
             <TouchableOpacity
               style={styles.button}
               onPress={decrementPlayer1Score}
+              disabled={player1Score === 0}
             >
               <Text style={styles.buttonText}>-</Text>
             </TouchableOpacity>
@@ -62,6 +92,7 @@ const ScoreScreen = ({ navigation }) => {
             <TouchableOpacity
               style={styles.button}
               onPress={decrementPlayer2Score}
+              disabled={player2Score === 0}
             >
               <Text style={styles.buttonText}>-</Text>
             </TouchableOpacity>

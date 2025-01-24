@@ -9,13 +9,44 @@ import {
   Alert,
 } from "react-native";
 import { ClubContext } from "../context/ClubContext";
+import { saveMatchDetails } from "../services/api";
 
 const MatchScreen = ({ navigation }) => {
-  const { image, playerName1, setPlayerName1, playerName2, setPlayerName2 } =
-    useContext(ClubContext);
+  const {
+    image,
+    playerName1,
+    setPlayerName1,
+    playerName2,
+    setPlayerName2,
+    selectedClub,
+    address,
+    subscriptionType,
+    setMatchId,
+  } = useContext(ClubContext);
 
-  const handleStartMatch = () => {
-    navigation.navigate("Score");
+  const handleStartMatch = async () => {
+    const matchDetails = {
+      club_id: selectedClub.id,
+      address,
+      subscriptionType: subscriptionType.value,
+      player1Name: playerName1,
+      player2Name: playerName2,
+      player1Score: 0,
+      player2Score: 0,
+      date: new Date().toISOString(),
+    };
+
+    try {
+      const response = await saveMatchDetails(matchDetails);
+      if (response.matchId) {
+        setMatchId(response.matchId);
+        navigation.navigate("Score");
+      } else {
+        Alert.alert("Error", "Failed to start match");
+      }
+    } catch (error) {
+      Alert.alert("Error", "Failed to start match");
+    }
   };
 
   return (

@@ -71,3 +71,18 @@ export const getClubList = async () => {
     throw error;
   }
 };
+
+export const updateScore = async (scoreDetails) => {
+  const formData = new FormData();
+  formData.append("match_id", scoreDetails.match_id);
+  formData.append("player1Score", scoreDetails.player1Score);
+  formData.append("player2Score", scoreDetails.player2Score);
+
+  try {
+    const response = await apiClient.post("/update-score", formData);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating score:", error);
+    throw error;
+  }
+};
