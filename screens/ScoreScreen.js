@@ -10,7 +10,7 @@ import {
   ScrollView,
 } from "react-native";
 import { ClubContext } from "../context/ClubContext";
-import { updateScore } from "../services/api";
+import { updateScore, endMatch } from "../services/api";
 
 const ScoreScreen = ({ navigation }) => {
   const {
@@ -70,8 +70,13 @@ const ScoreScreen = ({ navigation }) => {
     }
   };
 
-  const handleEndMatch = () => {
-    navigation.navigate("MatchDetails");
+  const handleEndMatch = async () => {
+    try {
+      await endMatch(matchId);
+      navigation.navigate("MatchDetails");
+    } catch (error) {
+      Alert.alert("Error", "Failed to end match");
+    }
   };
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>

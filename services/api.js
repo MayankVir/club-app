@@ -86,3 +86,17 @@ export const updateScore = async (scoreDetails) => {
     throw error;
   }
 };
+
+export const endMatch = async (matchId) => {
+  const formData = new FormData();
+  formData.append("match_id", matchId);
+  formData.append("status", "1");
+
+  try {
+    const response = await apiClient.post("/end-match", formData);
+    return response.data;
+  } catch (error) {
+    console.error("Error ending match:", error);
+    throw error;
+  }
+};
